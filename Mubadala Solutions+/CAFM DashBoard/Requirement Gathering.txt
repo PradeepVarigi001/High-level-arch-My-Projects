@@ -1,0 +1,169 @@
+1. gathering the data which out having any data quality issue
+2.Data prepocessing
+  1. identify the usefull column for the report	
+  2. Removing blank data or Replacing Blank with some value 
+  4. Check the each column quality
+3. Data modelling 
+	1. Need identify which is a fact table and which is a dimenstion table
+    2. Identify the common column in order to establish the relationship b/w the tables
+4. Developing a Report
+	1. Identifing the perfect template for the use case
+	2. Find the ideal visualization for the columns
+	2. specify which column the slicer is operating on to filter the data.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Work order 
+    1. Closed or completed --> closed
+	2. Remaining any status--> open
+
+------------------------------------------------------------------------------------------------------------------------------------------
+My question here we have different usecase which are not related to each other
+Suppose Asset Health is how it is related to FDD Alerts and remaining use cases how they are related to each other
+
+if yes we need a explanation
+if no whether we need to create differnt reports for different use cases
+
+
+--------------
+
+
+1)	Asset Health – Asset Condition (Asset API)
+	 -->https://app.facilio.ae/maintenance/api/odata/module/asset/
+	 
+
+2)	FDD Alerts 
+	--> Module:-Energy and utilities (Faults)
+	--> Which we call it as FDD Alarams
+	--> As of now we don't have the data from the client side. thet yet to start
+
+3)	Energy Consumption KWH & AED 
+	-->Module:- Energy and utilities (Meters)
+    --> By Building Energy b/c we have two building need find the energy consumption for individual buildings
+    --> this values are coming from Energy and utilities (Meters) 
+	--> Name of the column in pbi report is MubadalaBuilding(MTB total electricity) and Al Mamoura(AMA total electricity) 
+	--> need to extract data month wise 
+	-->(For this we are going to have Stacked Column Chart or Clustered Column Chart)
+Total Electricity = SUMX(
+    TREATAS(
+        {MubadalaBuilding, Al Mamoura},
+        'Energy and utilities (Meters)'[Building Name]
+    ),
+    [MTB total electricity] + [AMA total electricity]
+)
+
+This measure calculates the total electricity consumption for each month by summing the values from both buildings.
+https://www.geeksforgeeks.org/power-bi-line-stacked-column-chart/
+	
+	
+4) Energy Savings KWH & AED
+	--> Savings we need to calculate month by month , Quarter by quater , and year by year (Need to create measure or calucated column)
+	e.g if the consumption of this month is 1000 and  for the next month consumption is 500 and so the total savings is 500 we need to create month wise quaterwise and year wise as will
+	
+	Month Savings = 
+VAR CurrentMonthConsumption = SUM('YourTableName'[MTB total electricity])
+VAR PreviousMonthConsumption = CALCULATE(SUM('YourTableName'[MTB total electricity]), PREVIOUSMONTH('Calendar'[Date]))
+RETURN
+IF(ISBLANK(PreviousMonthConsumption), BLANK(), CurrentMonthConsumption - PreviousMonthConsumption)
+
+
+Quarter Savings = 
+VAR CurrentQuarterConsumption = SUM('YourTableName'[MTB total electricity])
+VAR PreviousQuarterConsumption = CALCULATE(SUM('YourTableName'[MTB total electricity]), PREVIOUSQUARTER('Calendar'[Date]))
+RETURN
+IF(ISBLANK(PreviousQuarterConsumption), BLANK(), CurrentQuarterConsumption - PreviousQuarterConsumption)
+
+Year Savings = 
+VAR CurrentYearConsumption = SUM('YourTableName'[MTB total electricity])
+VAR PreviousYearConsumption = CALCULATE(SUM('YourTableName'[MTB total electricity]), PREVIOUSYEAR('Calendar'[Date]))
+RETURN
+IF(ISBLANK(PreviousYearConsumption), BLANK(), CurrentYearConsumption - PreviousYearConsumption)
+
+for this we can use 
+	1. Line chart
+	2. Column Chart
+	3. Combo Chart
+	4. KPI Visual
+	5. Waterfall Chart
+		Need to find which chart is best
+	
+
+5)	Actuals Vs. Budget 
+	--> Module:-Budget (Budget) 
+	--> Here the budget dashbord need to be create  for each name (i.e., Budgettenants)
+		E.g: EAA funding buget  ()
+		we need to have 3 cards
+		1. Total buget
+		2. Actual amount (Need to know how they calculating and we need to what this actual amount is this saying about spendings)
+		3. Remining amount
+	--> For this we need to creat a name slicer when select name from the slicer it has to show all this values
+	--> for this we are going to use KPI Visual  
+	--> But we don't have Budget moduel to import the data
+
+	Which basically we see are we with in the budget or exceeding the budget
+	--> Slicername (Budgettenants)
+    Budgettent
+	 --> Al-mamoura(Resource id)
+	      --> Budget tenant 1
+		  --> Budget tenant 2
+	 --> Mubadala (Resource id)
+	     --> Budget tenant 1
+		 --> Budget tenant 2
+		 
+Total Budget = SUMX(
+    'Budget Data',
+    [Budget Amount]
+)
+
+Remaining Amount = VAR currBudget = CALCULATE(SUM('Budget Data'[Budget Amount]), ALLSELECTED('Budget Data'))
+                  VAR currActual = CALCULATE(SUM('Actual Spending Data'[Actual Amount]), ALLSELECTED('Actual Spending Data'))
+                  RETURN currBudget - currActual
+
+	
+	
+	
+5)	Overall Vendor KPI %
+		--> Module:-Maintaince -->work order
+		--> Vendor KPI means SLA success percent
+		--> it is from work order 
+		--> Here we have there fields 
+		     1. Make safe SLA
+			 2. Attend SLA
+			 3. Repaire SLA
+			this is just a view of the work order 
+		--> for this we can use staked cloumns chare
+	-->I didn't see this columns in ALl_work order
+	
+6)	No. of tenants with Contracts & %
+		--> As team said currently its not available
+		
+7)	Work Order – PPM on going & Completion %
+	-->Module:-Maintaince -->work order
+	-->	Work order 
+         1. Closed or completed --> closed
+	     2. Remaining any status--> open (This will based on due date and current data)
+		 
+8) Work Order – Reactive Maintenance open & overdue.
+	-->Module:-Maintaince -->work order
+	-->Current date is not available in the system we are taking it from power that is todays date
+	--> Duedaate-today(for over due)
+	--> Reactive Maintenance We have a column called Type column This also from work order
+
+To visualize the status of Reactive Maintenance work orders that are open and overdue, you can use the following approach in Power BI:
+
+Table or Matrix Visualization:
+Display the list of Reactive Maintenance work orders.
+Include columns for Work Order ID, Type, Due Date, and Status (Open or Overdue).
+Add a calculated column for "Days Overdue" to calculate the difference between the Due Date and today's date.
+Apply conditional formatting to highlight overdue work orders.
+This visualization will provide a detailed view of all Reactive Maintenance work orders, allowing stakeholders to quickly identify those that are open and overdue. The table or matrix format allows for easy sorting and filtering based on various parameters.
+	
+8)	Critical Spare Availability % 
+	--> Team need to get back
+	
+---------------Dashboards---------------------------
+https://www.pk-anexcelexpert.com/energy-consumptions-dashboard-in-power-bi/#google_vignette
+
+KPI -- https://radacad.com/kpis-and-power-bi
+	
+	https://ppcexpo.com/blog/budget-vs-actual-excel-template

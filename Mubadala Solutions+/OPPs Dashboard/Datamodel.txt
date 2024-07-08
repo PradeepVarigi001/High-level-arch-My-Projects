@@ -1,0 +1,44 @@
+opportunity(client)-->client(client)
+opportunity(client contacts)-->Accounts(primary client contact)
+opportunity(opportunity name)-->sales order (opportunityidvalue) --> this relationship is not valid
+opportunity products(service tower)-->service Tower(Service Tower Name)
+opportunity products(opportunity)-->opportunity(opportunity name)
+
+This relation ships are Not working 
+
+--------------------------------------------
+--------------------------------------------------------------------
+Account(account id) --> oppurnuity(_customerid_value)--> customer related information will get (1 to *) 
+Client contacts (_ownerid_value)-->Opportunity(1)_mdcbms_contractmanager_value--> manager details (* to *)
+Sales Order (_opportunityid_value)() -->Opportunity(1)opportunityid  --> get legal agreement details (like nos ....etc) (* to 1)
+Opportunity(1)opportunityid --> OpportunitiesProducts (_opportunityid_value)
+opportunity (service towers)-->service Tower(Service TowerOS)
+opportunity(_mdcbms_latesttimelog_value) -->Timelogs(mdcbms_timelogid)
+-------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

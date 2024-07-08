@@ -1,0 +1,19 @@
+{
+    "success": true,
+    "successMessage": null,
+    "responseTimeStamp": "2024-05-31T15:21:45.4759171+04:00",
+    "data": [
+        {
+            "id": 130,
+            "ticketNo": "HP-2023-1",
+            "serviceCategoryName": "Helpdesk ",
+            "serviceName": "Weave Support",
+            "description": "Hi Team,\n\nI have noticed that my remote working days balance reflected on the dashboard page is inaccurate. I have already availed 1.5 days of remote work this month but on my dashboard page it shows 0 days availed.\n\nAdditionally, where can I submit the request for assignment day?\n\n\nRegards,\n\nWaqas",
+            "createdDate": "2023-11-15T08:33:25.333",
+            "requesterName": "Waqas Sohail Muhammad Suhail Ahmed",
+            "ticketStatus": "Completed",
+            "currentStepName": "Closure",
+            "closedDate": "2023-11-22T10:33:20.26",
+            "isDelayed": false,
+            "serviceRating": 3
+        },
