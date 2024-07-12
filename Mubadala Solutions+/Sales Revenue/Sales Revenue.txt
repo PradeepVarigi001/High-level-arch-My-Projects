@@ -1,0 +1,86 @@
+As discussed, Kindly create separate page to show Agreement value split into months based on Agreement Start Date and Expiration Date.
+----------------
+So here use case is we have Agreementnumber,Agreement value, Startdate and expiration date, 
+
+if Agreement number (Az3123) agremnet value exmple lets take 3000 here start date example lets take 01-08-2023 and the expiration date is 31-10-2023 the difference between start date and expiration date is 3 month I and to get this three months names Aug sep and oct and we have agreement value 3000 so i want do average with result coming form start date - expiration date result will be assigned to each month i.e., Aug Sep oct remaining monthe will be zero for this i will matrix visual in power bi
+
+
+Agreement number   Agreement Value  Start date Expiration Date Jan feb mar april may jun jul aug  sep  oct nov dec
+Az3123                 3000        01-08-2023   31-10-2023       0   0  0    0     0   0   0 1000 1000 1000 0  0
+------------------------------------
+MonthlyValue = 
+VAR StartMonth = MONTH(MIN('Table'[Start date]))
+VAR EndMonth = MONTH(MAX('Table'[Expiration Date]))
+VAR TotalMonths = DATEDIFF(MIN('Table'[Start date]), MAX('Table'[Expiration Date]), MONTH) + 1
+VAR CurrentMonth = MONTH(TODAY())  -- Change this to a specific month if needed
+
+RETURN 
+IF(
+    CurrentMonth >= StartMonth && CurrentMonth <= EndMonth,
+    DIVIDE(SUM('Table'[Agreement Value]), TotalMonths),
+    0
+)
+---------------------
+Months between --> difference in month
+Agreenbetween--> Amount/Differen --> Average
+-----------------------
+MonthsBetween = DATEDIFF('Agreements'[Start Date], 'Agreements'[Expiration Date], MONTH) + 1
+
+AverageAmount = DIVIDE('Agreements'[AMOUNT],'Agreements'[MonthsBetween])
+
+Calender table --> having months and years --> join with Agreements (then we can go accouring to the months)
+
+--------------------------------
+Agreement Value per Month = 
+VAR StartDate = 'Agreements'[Start Date]
+VAR EndDate = 'Agreements'[Expiration Date]
+VAR AgreementValue = 'Agreements'[AMOUNT]
+VAR NumberOfMonths = DATEDIFF(StartDate, EndDate, MONTH)+1
+RETURN
+DIVIDE(AgreementValue, NumberOfMonths, 0)
+
+---------------------------------------
+Create time dimenstion table
+
+31 dec 2022	31 jan 2023 --> split this in to rows
+--------------------------------------------------------------
+MonthEndDatesBetweenYears_CC
+let
+    StartDate = DateTime.From([Start Date]),
+    EndDate = DateTime.From([Expiration Date]),
+    StartMonth = Date.Month(StartDate),
+    StartYear = Date.Year(StartDate),
+    EndMonth = Date.Month(EndDate),
+    EndYear = Date.Year(EndDate),
+    NumberOfMonths = Number.RoundDown(Duration.Days(Duration.From(EndDate - StartDate)) / 30.4375) + 1,
+    MonthNumbers = List.Transform({0..NumberOfMonths - 1}, each [
+        MonthNum = Number.Mod(StartMonth + _ - 1, 12) + 1,
+        YearNum = StartYear + Number.IntegerDivide(StartMonth + _ - 1, 12)
+    ]),
+    MonthEndDates = List.Transform(MonthNumbers, each Date.EndOfMonth(#date([YearNum], [MonthNum], 1))),
+    MonthEndDatesList = Text.Combine(List.Transform(MonthEndDates, each Date.ToText(_, "yyyy-MMMM-dd")), ", ")
+in
+    MonthEndDatesList
+----------------------------------------------------------------
+AgreementValuePerMonth_CC
+let
+    StartDate = [Start Date],
+    EndDate = [Expiration Date],
+    AgreementValue = [AMOUNT],
+    StartYear = Date.Year(StartDate),
+    StartMonth = Date.Month(StartDate),
+    EndYear = Date.Year(EndDate),
+    EndMonth = Date.Month(EndDate),
+    NumberOfMonths = (EndYear - StartYear) * 12 + EndMonth - StartMonth + 1,
+    AgreementValuePerMonth = try AgreementValue / NumberOfMonths otherwise 0
+in
+    AgreementValuePerMonth
+----------------------------------------------------------------------
+For this i copied the pbx file to sever why b/c in order to connect to the on premisis database and created m-code in the power
+Query editor created custome column for  AgreementValuePerMonth and MonthEndDatesBetweenYears we got some thing like(31-Aug-2023,31-Sep-2023) to come in row I transformed the respective row in to comma seprated
+----------------------
+
+
+
+
+
