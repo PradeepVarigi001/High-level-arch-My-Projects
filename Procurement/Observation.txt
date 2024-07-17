@@ -1,0 +1,254 @@
+1.Purchase requistion Recevied
+
+I have recived date (dd-mmm-yy) and also i have a requestion number now I want to get count of requestion number w.r.t recived
+
+current month 
+
+RequestionCountCurrentMonth = 
+VAR CurrentMonth = MONTH(TODAY())
+VAR CurrentYear = YEAR(TODAY())
+RETURN
+CALCULATE(
+    COUNT('Purchase Requisition Details'[REQUISITION_NUMBER]),
+    FILTER(
+        'Purchase Requisition Details',
+        MONTH('TableName'[RECEIVED_DATE]) = CurrentMonth &&
+        YEAR('TableName'[RECEIVED_DATE]) = CurrentYear
+    )
+)
+
+YTD
+
+RequestionCountYTD = 
+TOTALYTD(
+    DISTINCTCOUNT('TableName'[RequestionNumber]),
+    'TableName'[ReceivedDate]
+)
+
+Line chart
+PURCHASE REQUISITIONS RECEIVED
+RECEIVED_DATE,RequestionCountYTD 
+--------------------------------------------------------------------------------------------------------------------------------
+2.Purchase Requistion Completed
+
+table : Purchase requsition details
+completed date
+
+RequestionCompeltedCurrentMonth = 
+VAR CurrentMonth = MONTH(TODAY())
+VAR CurrentYear = YEAR(TODAY())
+RETURN
+CALCULATE(
+    DISTINCTCOUNT('Purchase Requisition Details'[REQUISITION_NUMBER]),
+    FILTER(
+        'Purchase Requisition Details',
+        MONTH('Purchase Requisition Details'[COMPLETED_DATE]) = CurrentMonth &&
+        YEAR('Purchase Requisition Details'[COMPLETED_DATE]) = CurrentYear
+    )
+)
+
+YTD
+RequestionCompeltedYTD = 
+CALCULATE(
+    DISTINCTCOUNT('Purchase Requisition Details'[REQUISITION_NUMBER]),
+    DATESYTD('Purchase Requisition Details'[COMPLETED_DATE].[Date])
+)
+
+Line Chart
+
+Purchase Requistion Completed
+Line : COMPLETED_DATE,RequestionCompeltedYTD
+
+-----------------------------------------------------------------------------------------------------------------------------
+3.Purchase Requisition Value (AED)   
+
+Current Date          
+
+RequestionValueCurrentMonth = 
+VAR CurrentMonth = MONTH(TODAY())
+VAR CurrentYear = YEAR(TODAY())
+RETURN
+CALCULATE(
+    SUM('Purchase Requisition Details'[REQ_AMOUNT]),
+    FILTER(
+        'Purchase Requisition Details',
+        MONTH('Purchase Requisition Details'[RECEIVED_DATE]) = CurrentMonth &&
+        YEAR('Purchase Requisition Details'[RECEIVED_DATE]) = CurrentYear
+    )
+)
+
+
+YTD
+
+RequisitionValueYearToDate = 
+VAR CurrentYear = YEAR(TODAY())
+RETURN
+CALCULATE(
+    SUM('Purchase Requisition Details'[REQ_AMOUNT]),
+    FILTER(
+        'Purchase Requisition Details',
+        YEAR('Purchase Requisition Details'[RECEIVED_DATE]) = CurrentYear &&
+        'Purchase Requisition Details'[RECEIVED_DATE] <= TODAY()
+    )
+)
+
+or
+
+RequisitionValueYearToDate = 
+CALCULATE(
+    SUM('Purchase Requisition Details'[REQ_AMOUNT]),
+    DATESYTD('Purchase Requisition Details'[RECEIVED_DATE].[Date])
+)
+
+Line chart 
+PR SPEND INTIATED (AED IN MILLIONS)
+REQ_AMOUNT,RECEIVED_DATE
+-------------------------------------------------------------------------------------------------------
+4. Contracts Completed
+TableName: Completed Contracts
+contract_upload_request_id
+last_update_Date
+
+Current Date
+
+ContractsCompletedCurrentMonth = 
+VAR CurrentMonth = MONTH(TODAY())
+VAR CurrentYear = YEAR(TODAY())
+RETURN
+CALCULATE(
+    DISTINCTCOUNT('Completed Contracts'[contract_upload_request_id]),
+    FILTER(
+        'Completed Contracts',
+        MONTH('Completed Contracts'[last_update_Date]) = CurrentMonth &&
+        YEAR('Completed Contracts'[last_update_Date]) = CurrentYear
+    )
+)
+
+YTD
+ContractCompeltedYTD = 
+CALCULATE(
+    DISTINCTCOUNT('Completed Contracts'[contract_upload_request_id]),
+    DATESYTD('Completed Contracts'[last_update_Date].[Date])
+)
+------------------------------------------------------------------------------------------------------------------------------
+Approved CTWS
+Table : CTWS
+Header_ID , CREATION_DATE,STATUS 
+
+I want to do distinct count on header_id  on creation_date having the status is Approved 
+
+ApprovedCTWCurrentMonth = 
+VAR CurrentMonth = MONTH(TODAY())
+VAR CurrentYear = YEAR(TODAY())
+RETURN
+CALCULATE(
+    DISTINCTCOUNT('CTWS'[Header_ID]),
+    FILTER(
+        'CTWS',
+        MONTH('CTWS'[Header_ID]) = CurrentMonth &&
+        YEAR('CTWS'[CREATION_DATE]) = CurrentYear &&
+        'CTWS'[STATUS] = "APPROVED"
+    )
+)
+
+DateKey = FORMAT(CTWs[CREATION_DATE].[Date],"YYYYMMDD")
+YTD
+
+ContractCompeltedYTD = 
+CALCULATE(
+    DISTINCTCOUNT('CTWS'[Header_ID]),
+    DATESYTD('Header_ID'[CREATION_DATE].[Date])
+	
+)
+
+
+Line Chart
+APPROVED CTW
+Header_ID,CREATION_DATE
+
+-----------------------------------------------------------------------------------------------------------------------------
+Approved CTW Value (AED)
+table : CTW
+Amount
+
+ApprovedCTWValueCurrentMonth = 
+VAR CurrentMonth = MONTH(TODAY())
+VAR CurrentYear = YEAR(TODAY())
+RETURN
+CALCULATE(
+    SUM('CTWs'[AMOUNT]),
+    FILTER(
+        'CTWs',
+        MONTH('CTWs'[CREATION_DATE]) = CurrentMonth &&
+        YEAR('CTWs'[CREATION_DATE]) = CurrentYear
+    )
+)
+
+
+YTD
+
+ApprovedCTWValueYearToDate = 
+CALCULATE(
+    SUM('CTWs'[AMOUNT]),
+    DATESYTD('CTWs'[CREATION_DATE].[Date])
+)
+
+Line Chart
+APPROVED CTW VALUE (AED IN THOUSANDS)
+AMOUNT,CREATION_DATE
+
+-------------------------------------------------------------------------------------------------------------------------------
+Contract Variation Requests
+
+Table : Contract Variation Requests
+XX_REQUEST_ID
+SUBMIT_DATE
+
+CVRCompeltedCurrentMonth = 
+VAR CurrentMonth = MONTH(TODAY())
+VAR CurrentYear = YEAR(TODAY())
+RETURN
+CALCULATE(
+    DISTINCTCOUNT('Contract Variation Requests'[XX_REQUEST_ID]),
+    FILTER(
+        'Contract Variation Requests',
+        MONTH('Contract Variation Requests'[SUBMIT_DATE]) = CurrentMonth &&
+        YEAR('Contract Variation Requests'[SUBMIT_DATE]) = CurrentYear
+    )
+)
+
+
+YTD
+
+CVRCompeltedYTD = 
+CALCULATE(
+    DISTINCTCOUNT('Contract Variation Requests'[XX_REQUEST_ID]),
+    DATESYTD('Contract Variation Requests'[SUBMIT_DATE].[Date])
+)
+---------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
